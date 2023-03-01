@@ -226,34 +226,63 @@ Matrix Matrix::operator+(Matrix &rhs){
 }
 
 Matrix Matrix::operator-(Matrix &rhs){
+    
+    //Error Größe
+
     auto result = Matrix();
+    for(size_t i = 0; i < this->num_columns; ++i){
+        result.push_back(this->get(i) - rhs[i]);
+    }
 }
 
 Matrix Matrix::operator*(Matrix &rhs)
 {
-    auto result = Matrix();
+    //In Errors
+    if(this->num_columns != rhs.num_rows){
+        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
+    }
 
+    auto result =  Matrix();
+    for(size_t i = 0; i < this->num_rows; i++){
+        for (size_t k = 0; k < rhs.num_columns; k++){
+            for(size_t t = 0; t < rhs.num_rows;t++){
+                result[i].set(k, this->get(i).get(k) * rhs.get(k).get(t));
+            }
+        }
+    }
+    return result;
 };
 
-Matrix Matrix::operator/(Matrix &rhs){
-    auto result = Matrix();
-    
-}
 
 void Matrix::operator+=(Matrix &rhs){
-    
+    //Fehler ding 
+    for(size_t i = 0; i < this->num_columns; ++i){
+        this->set(i, this->get(i) + rhs[i]);
+    }
 }
 
 void Matrix::operator-=(Matrix &rhs){
-    
+   
+    //Fehler ding
+    for(size_t i = 0; i < this->num_columns; ++i){
+        this->set(i, this->get(i) - rhs[i]);
+    }
 }
 
 void Matrix::operator*=(Matrix &rhs){
     
-}
+    //Fehler ding
+    if(this->num_columns != rhs.num_rows){
+        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
+    }
 
-void Matrix::operator/=(Matrix &rhs){
-    
+    for(size_t i = 0; i < this->num_rows; i++){
+        for (size_t k = 0; k < rhs.num_columns; k++){
+            for(size_t t = 0; t < rhs.num_rows;t++){
+                this[i].set(k, this[i].get(k) * rhs.get(k).get(t));
+            }
+        }
+    }
 }
 
 Vector Matrix::operator[](size_t index){
