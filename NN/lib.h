@@ -233,6 +233,9 @@ Matrix Matrix::operator+(Matrix &rhs){
 }
 
 Matrix Matrix::operator-(Matrix &rhs){
+    
+    //Error Größe
+
     auto result = Matrix();
     for(size_t i = 0; i < this->num_columns; ++i){
         const auto e = this->get(i) - rhs.get(i);
@@ -256,7 +259,6 @@ Matrix Matrix::operator*(Matrix &rhs){
             }
         }
     }
-
     return result;
 };
 
