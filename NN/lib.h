@@ -280,5 +280,6 @@ Vector ActiviationFunctions::sigmoid(Vector v){
     static auto e = std::exp(1);
     static auto e_vector = Vector(std::vector<double>(v.size, e));
     // Operator overload with skalar
-    return (1.0F / (1.0F + e_vector.pow(v.neg())));
+    auto _x = v.neg();
+    return (1.0 / (1.0 + e_vector.pow(_x)));
 }
