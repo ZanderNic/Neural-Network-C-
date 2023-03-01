@@ -42,7 +42,8 @@ class Vector{
                 result.set(i, e);
             }
 
-            return result;}
+            return result;
+        }
 
         friend Vector operator-(double lhs, Vector &rhs){
             auto result = Vector();
@@ -51,7 +52,8 @@ class Vector{
                 result.set(i, e);
             }
 
-            return result;}
+            return result;
+        }
 
         friend Vector operator*(double lhs, Vector &rhs){
             auto result = Vector();
@@ -60,7 +62,8 @@ class Vector{
                 result.set(i, e);
             }
 
-            return result;}
+            return result;
+        }
 
         friend Vector operator/(double lhs, Vector &rhs){
             auto result = Vector();
@@ -69,7 +72,8 @@ class Vector{
                 result.set(i, e);
             }
 
-            return result;}
+            return result;
+        }
 
         void operator+=(Vector &rhs);
         void operator-=(Vector &rhs);
@@ -168,7 +172,7 @@ Vector Vector::neg(){
     return result;
 }
 
-Vector Vector::pow(int exp){
+Vector Vector::pow(const int exp){
     Vector result = Vector();
     
     for (size_t i = 0; i < this->size; ++i){
@@ -202,12 +206,12 @@ class Matrix : Vector{
         Matrix operator/(Matrix &rhs);
         size_t num_columns = m_backing_matrix.size();
         size_t num_rows = m_backing_matrix[0].size;
-        Vector operator[](size_t index);
+        Vector& operator[](size_t index){return m_backing_matrix[index];}
         void operator+=(Matrix &rhs);      
         void operator-=(Matrix &rhs);
         void operator*=(Matrix &rhs);
         void operator/=(Matrix &rhs);
-        Vector get(size_t index){return m_backing_matrix[index];}
+        Vector& get(size_t index){return m_backing_matrix[index];}
         void set(size_t index, Vector element){m_backing_matrix[index] = element;}
         void push_back(Vector element){m_backing_matrix.push_back(element);}
         void pop_back(){m_backing_matrix.pop_back();}
@@ -221,65 +225,96 @@ class Matrix : Vector{
 Matrix Matrix::operator+(Matrix &rhs){
     auto result = Matrix();
     for(size_t i = 0; i < this->num_columns; ++i){
-        result.push_back(this->get(i) + rhs[i]);
+        const auto e = this->get(i) + rhs.get(i);
+        result.push_back(e);
     }
+
+    return result;
 }
 
 Matrix Matrix::operator-(Matrix &rhs){
     auto result = Matrix();
+    for(size_t i = 0; i < this->num_columns; ++i){
+        const auto e = this->get(i) - rhs.get(i);
+        result.push_back(e);
+    }
+
+    return result;
 }
 
-Matrix Matrix::operator*(Matrix &rhs)
-{
+Matrix Matrix::operator*(Matrix &rhs){
     auto result = Matrix();
+    //Fehler ding
+    if(this->num_columns != rhs.num_rows){
+        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
+    }
 
+    for(size_t i = 0; i < this->num_rows; ++i){
+        for (size_t k = 0; k < rhs.num_columns; ++k){
+            for(size_t j = 0; j < rhs.num_rows; ++j){
+                result[i].set(j, result[i][j] * rhs[i][j]);
+            }
+        }
+    }
+
+    return result;
 };
 
-Matrix Matrix::operator/(Matrix &rhs){
-    auto result = Matrix();
-    
-}
 
 void Matrix::operator+=(Matrix &rhs){
-    
+    //Fehler ding 
+    for(size_t i = 0; i < this->num_columns; ++i){
+        this->set(i, this->get(i) + rhs[i]);
+    }
 }
 
 void Matrix::operator-=(Matrix &rhs){
-    
+   
+    //Fehler ding
+    for(size_t i = 0; i < this->num_columns; ++i){
+        this->set(i, this->get(i) - rhs[i]);
+    }
 }
 
 void Matrix::operator*=(Matrix &rhs){
-    
-}
+    //Fehler ding
+    if(this->num_columns != rhs.num_rows){
+        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
+    }
 
-void Matrix::operator/=(Matrix &rhs){
-    
-}
-
-Vector Matrix::operator[](size_t index){
-    return this->m_backing_matrix[index];
+    for(size_t i = 0; i < this->num_rows; ++i){
+        for (size_t k = 0; k < rhs.num_columns; ++k){
+            for(size_t j = 0; j < rhs.num_rows; ++j){
+                this->get(i).set(j, this->get(i).get(j) * rhs[k][j]);
+            }
+        }
+    }
 }
 
 class ActiviationFunctions{
     private:
     protected:
     public:
-        ActiviationFunctions() = delete;
-        ActiviationFunctions(std::string name="sigmoid");
-        Vector sigmoid(Vector v);
+        ActiviationFunctions() = default;
+        ActiviationFunctions(Vector &v, std::string name="sigmoid");
+        Vector sigmoid(Vector &v);
+        void testFunc1() {
+            puts("func2");
+        }
         ~ActiviationFunctions() = default;
 };
 
-ActiviationFunctions::ActiviationFunctions(std::string name, Vector v){
-    std::map<std::string, std::function<double(Vector)>> activation_functions = {{"sigmoid", sigmoid}};
-    
-    activation_functions[name](v);
+ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
+    using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
+    ActMap activation_functions = {{"sigmoid", sigmoid}};
+
+    auto activiation_result = activation_functions[name](v);
 }
 
-Vector ActiviationFunctions::sigmoid(Vector v){
-    static auto e = std::exp(1);
-    static auto e_vector = Vector(std::vector<double>(v.size, e));
-    // Operator overload with skalar
+Vector ActiviationFunctions::sigmoid(Vector &v){
+    auto e = std::exp(1);
+    auto e_vector = Vector(std::vector<double>(v.size, e));
     auto _x = v.neg();
-    return (1.0 / (1.0 + e_vector.pow(_x)));
+    const auto e_x = e_vector.pow(_x);
+    return (1.0 / (1.0 + e_x));
 }
