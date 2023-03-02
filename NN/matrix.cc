@@ -31,13 +31,9 @@ Matrix Matrix::operator-(Matrix &rhs){
 
 Matrix Matrix::operator*(Matrix &rhs){
 
-    Errors::same_dimension(*this, rhs);
+    Errors::same_rows_to_colmns(*this, rhs);
 
     auto result = Matrix();
-
-    if(this->num_columns() != rhs.num_rows()){
-        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
-    }
 
     for(std::size_t i = 0; i < this->num_rows(); ++i){
         for (std::size_t k = 0; k < rhs.num_columns(); ++k){
@@ -70,11 +66,7 @@ void Matrix::operator-=(Matrix &rhs){
 
 void Matrix::operator*=(Matrix &rhs){
 
-    Errors::same_dimension(*this, rhs);
-
-    if(this->num_columns() != rhs.num_rows()){
-        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
-    }
+    Errors::same_rows_to_colmns(*this, rhs);
 
     for(std::size_t i = 0; i < this->num_rows(); ++i){
         for (std::size_t k = 0; k < rhs.num_columns(); ++k){

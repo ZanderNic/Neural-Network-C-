@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "vector.hpp"
 
 ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
     using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
