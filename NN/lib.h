@@ -9,53 +9,6 @@
 #include <functional> // std::function
 #include <cmath> // std::exp
 
-class Vector;
-class Matrix;
-
-namespace Errors{
-    class DimensionError : public std::exception {
-        public:
-            DimensionError(std::string_view _message) : message(_message){};
-
-            std::string message;
-
-            [[nodiscard("Error Message")]] const char *what() const noexcept override{
-                return message.c_str();
-            }
-    };
-
-    void same_dimension(Vector &v1, Vector &v2){
-        try {
-            if (v1.size() != v2.size()){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << v1.size() << " != " << v2.size() << std::endl;
-        }
-    }
-
-    void same_dimension(Matrix &m1, Matrix &m2){
-        try {
-            if ((m1.num_columns() != m2.num_columns()) && (m1.num_rows() != m2.num_rows())){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << "(" << m1.num_columns() << "," << m1.num_rows() << ")" 
-            << " != " << "(" << m2.num_columns() << "," << m2.num_rows() << ")" << std::endl;
-        }
-    }
-
-    void same_rows_to_colmns(Matrix &m1, Matrix &m2){
-        try {
-            if (m1.num_rows() != m2.num_columns()){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << m1.num_columns() << " != " << m2.num_rows() << std::endl;
-        }
-    }
-}
-
 class Vector{
     protected:
     public:
@@ -147,141 +100,20 @@ class Vector{
         void operator-=(Vector &rhs);
         void operator/=(Vector &rhs);
         void operator*=(Vector &rhs);
-        friend std::ostream& operator<<(std::ostream& os, const Vector& p);
+        friend std::ostream& operator<<(std::ostream& os, const Vector& v){
+            os << "(";
+            for (std::size_t i = 0; i < v.size() - 1; ++i){
+                os << v.get(i) << "," << std::endl;
+            }
+            os << v.get(v.size() - 1) << ")";
+
+            return os;
+        }
         ~Vector() = default;
 
     private:
         vector_ m_backing_vec;
 };
-
-Vector Vector::operator+(Vector &rhs){
-
-    Errors::same_dimension(*this, rhs);
-
-    std::cout << rhs.size();
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.push_back(this->get(i) + rhs[i]);
-    }
-
-    return result;
-}
-
-Vector Vector::operator-(Vector &rhs){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.push_back(this->get(i) - rhs[i]);
-    }
-    return result;
-}
-
-Vector Vector::operator/(Vector &rhs){ 
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.push_back(this->get(i) - rhs[i]);
-    }
-    return result;
-}
-
-Vector Vector::operator*(Vector &rhs){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.push_back(this->get(i) * rhs[i]);
-    }
-    return result;
-}
-
-Vector Vector::operator<(Vector &rhs){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.set(i, this->get(i) < rhs[i]);
-    }
-
-    return result;
-}
-
-Vector Vector::operator>(Vector &rhs){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.set(i, this->get(i) > rhs[i]);
-    }
-
-    return result;
-}
-
-void Vector::operator+=(Vector &rhs){
-    for (std::size_t i = 0; i < this->size(); ++i){
-        auto e = this->get(i) + rhs[i];
-        this->set(i, e);
-    }
-}
-
-void Vector::operator-=(Vector &rhs){
-    for (std::size_t i = 0; i < this->size(); ++i){
-        auto e = this->get(i) - rhs[i];
-        this->set(i, e);
-    }
-}
-
-void Vector::operator/=(Vector &rhs){
-    for (std::size_t i = 0; i < this->size(); ++i){
-        auto e = this->get(i) / rhs[i];
-        this->set(i, e);
-    }
-}
-
-void Vector::operator*=(Vector &rhs){
-    for (std::size_t i = 0; i < this->size(); ++i){
-        auto e = this->get(i) - rhs[i];
-        this->set(i, e);
-    }
-}
-
-std::ostream& operator<<(std::ostream& os, Vector& v){
-    os << "(";
-    for (std::size_t i = 0; i < v.size() - 1; ++i){
-        os << v[i] << "," << std::endl;
-    }
-    os << v.get(v.size() - 1) << ")";
-
-    return os;
-}
-
-Vector Vector::neg(){
-    Vector result = Vector();
-    
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.set(i, -this->get(i));
-    }
-
-    return result;
-}
-
-Vector Vector::pow(const int exp){
-    Vector result = Vector();
-    
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.set(i, std::pow(this->get(i), exp));
-    }
-
-    return result;
-}
-
-Vector Vector::pow(const Vector &exp) const{
-    Vector result = Vector();
-    
-    for (std::size_t i = 0; i < this->size(); ++i){
-        result.set(i, std::pow(this->get(i), exp.get(i)));
-    }
-
-    return result;
-}
 
 class Matrix : public Vector{
     
@@ -313,76 +145,6 @@ class Matrix : public Vector{
         matrix m_backing_matrix;
 };
 
-Matrix Matrix::operator+(Matrix &rhs){
-    //Errors::same_dimension(*this, rhs); 
-    auto result = Matrix();
-    for(std::size_t i = 0; i < this->num_columns(); ++i){
-        const auto e = this->get(i) + rhs.get(i);
-        result.push_back(e);
-    }
-
-    return result;
-}
-
-Matrix Matrix::operator-(Matrix &rhs){
-    auto result = Matrix();
-    for(std::size_t i = 0; i < this->num_columns(); ++i){
-        const auto e = this->get(i) - rhs.get(i);
-        result.push_back(e);
-    }
-
-    return result;
-}
-
-Matrix Matrix::operator*(Matrix &rhs){
-    auto result = Matrix();
-    //Fehler ding
-    if(this->num_columns() != rhs.num_rows()){
-        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
-    }
-
-    for(std::size_t i = 0; i < this->num_rows(); ++i){
-        for (std::size_t k = 0; k < rhs.num_columns(); ++k){
-            for(std::size_t j = 0; j < rhs.num_rows(); ++j){
-                result[i].set(j, result[i][j] * rhs[i][j]);
-            }
-        }
-    }
-
-    return result;
-};
-
-
-void Matrix::operator+=(Matrix &rhs){
-    //Fehler ding 
-    for(std::size_t i = 0; i < this->num_columns(); ++i){
-        this->set(i, this->get(i) + rhs[i]);
-    }
-}
-
-void Matrix::operator-=(Matrix &rhs){
-   
-    //Fehler ding
-    for(std::size_t i = 0; i < this->num_columns(); ++i){
-        this->set(i, this->get(i) - rhs[i]);
-    }
-}
-
-void Matrix::operator*=(Matrix &rhs){
-    //Fehler ding
-    if(this->num_columns() != rhs.num_rows()){
-        throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
-    }
-
-    for(std::size_t i = 0; i < this->num_rows(); ++i){
-        for (std::size_t k = 0; k < rhs.num_columns(); ++k){
-            for(std::size_t j = 0; j < rhs.num_rows(); ++j){
-                this->get(i).set(j, this->get(i).get(j) * rhs[k][j]);
-            }
-        }
-    }
-}
-
 class ActiviationFunctions{
     private:
     protected:
@@ -394,32 +156,47 @@ class ActiviationFunctions{
         ~ActiviationFunctions() = default;
 };
 
-ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
-    using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
-    ActMap activation_functions = {{"sigmoid", sigmoid}};
-    auto activiation_result = activation_functions[name](v);
-}
+namespace Errors{
+    class DimensionError : public std::exception {
+        public:
+            DimensionError(std::string_view _message) : message(_message){};
 
+            std::string message;
 
-Vector ActiviationFunctions::sigmoid(Vector &v){
-    static const auto e = std::exp(1);
-    static auto e_vector = Vector(std::vector<double>(v.size(), e));
-    const auto _x = v.neg();
-    const auto e_x = e_vector.pow(_x);
+            [[nodiscard("Error Message")]] const char *what() const noexcept override{
+                return message.c_str();
+            }
+    };
 
-    return (1.0 / (1.0 + e_x));
-}
-
-Vector ActiviationFunctions::relu(Vector &v){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < v.size(); ++i){
-        if (v[i] <= 0){
-            result[i] = 0;
-        } else{
-            result[i] = v[i];
+    void same_dimension(Vector &v1, Vector &v2){
+        try {
+            if (v1.size() != v2.size()){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << v1.size() << " != " << v2.size() << std::endl;
         }
     }
 
-    return result;
+    void same_dimension(Matrix &m1, Matrix &m2){
+        try {
+            if ((m1.num_columns() != m2.num_columns()) && (m1.num_rows() != m2.num_rows())){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << "(" << m1.num_columns() << "," << m1.num_rows() << ")" 
+            << " != " << "(" << m2.num_columns() << "," << m2.num_rows() << ")" << std::endl;
+        }
+    }
+
+    void same_rows_to_colmns(Matrix &m1, Matrix &m2){
+        try {
+            if (m1.num_rows() != m2.num_columns()){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << m1.num_columns() << " != " << m2.num_rows() << std::endl;
+        }
+    }
 }
+
