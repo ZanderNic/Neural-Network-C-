@@ -1,4 +1,5 @@
-#include <lib.h>
+#include <vector.hpp>
+#include <errors.hpp>
 
 Vector Vector::operator+(Vector &rhs){
 

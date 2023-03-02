@@ -115,36 +115,6 @@ class Vector{
         vector_ m_backing_vec;
 };
 
-class Matrix : public Vector{
-    
-    protected:
-    public:
-        using matrix = std::vector<Vector>;
-        Matrix() = default;
-        Matrix(matrix p):m_backing_matrix{std::move(p)}{}
-        
-        Matrix operator-(Matrix &rhs);
-        Matrix operator+(Matrix &rhs);
-        Matrix operator*(Matrix &rhs);
-        Matrix operator/(Matrix &rhs);
-        std::size_t num_columns(){return m_backing_matrix.size();}
-        std::size_t num_rows(){return m_backing_matrix[0].size();}
-        Vector& operator[](std::size_t index){return m_backing_matrix[index];}
-        void operator+=(Matrix &rhs);      
-        void operator-=(Matrix &rhs);
-        void operator*=(Matrix &rhs);
-        void operator/=(Matrix &rhs);
-        Vector& get(std::size_t index){return m_backing_matrix[index];}
-        void set(std::size_t index, Vector element){m_backing_matrix[index] = element;}
-        void push_back(Vector element){m_backing_matrix.push_back(element);}
-        void pop_back(){m_backing_matrix.pop_back();}
-        
-        ~Matrix() = default;
-    
-    private:
-        matrix m_backing_matrix;
-};
-
 class ActiviationFunctions{
     private:
     protected:
@@ -155,47 +125,3 @@ class ActiviationFunctions{
         static Vector relu(Vector &v);
         ~ActiviationFunctions() = default;
 };
-
-namespace Errors{
-    class DimensionError : public std::exception {
-        public:
-            DimensionError(std::string_view _message) : message(_message){};
-
-            std::string message;
-
-            [[nodiscard("Error Message")]] const char *what() const noexcept override{
-                return message.c_str();
-            }
-    };
-
-    void same_dimension(Vector &v1, Vector &v2){
-        try {
-            if (v1.size() != v2.size()){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << v1.size() << " != " << v2.size() << std::endl;
-        }
-    }
-
-    void same_dimension(Matrix &m1, Matrix &m2){
-        try {
-            if ((m1.num_columns() != m2.num_columns()) && (m1.num_rows() != m2.num_rows())){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << "(" << m1.num_columns() << "," << m1.num_rows() << ")" 
-            << " != " << "(" << m2.num_columns() << "," << m2.num_rows() << ")" << std::endl;
-        }
-    }
-
-    void same_rows_to_colmns(Matrix &m1, Matrix &m2){
-        try {
-            if (m1.num_rows() != m2.num_columns()){
-                throw(DimensionError("Can't execute between different sizes."));
-            }
-        } catch (DimensionError e){
-            std::cerr << e.what() << m1.num_columns() << " != " << m2.num_rows() << std::endl;
-        }
-    }
-}

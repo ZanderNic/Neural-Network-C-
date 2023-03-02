@@ -1,4 +1,6 @@
-#include "lib.h"
+#include "matrix.hpp"
+#include "vector.hpp"
+#include "errors.hpp"
 
 Matrix Matrix::operator+(Matrix &rhs){
 
