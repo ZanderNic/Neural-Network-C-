@@ -1,11 +1,11 @@
-#include <vector.hpp>
-#include <errors.hpp>
+#include "vector.hpp"
+#include "errors.hpp"
+#include "matrix.hpp"
 
 Vector Vector::operator+(Vector &rhs){
 
     Errors::same_dimension(*this, rhs);
 
-    std::cout << rhs.size();
     auto result = Vector();
 
     for (std::size_t i = 0; i < this->size(); ++i){

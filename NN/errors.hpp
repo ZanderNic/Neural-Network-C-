@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Errors{
     class DimensionError : public std::exception {
         public:

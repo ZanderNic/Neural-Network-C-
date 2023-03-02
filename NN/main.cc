@@ -1,10 +1,10 @@
 #include <iostream>
 #include <vector>
 
-#include "vector.hpp"
+#include "layer.hpp"
+#include "forward.hpp"
 
 int main(){
-    std::vector<double> p1{1.0f, 2.0f, 3.0f};
-    Vector vec1(p1);
-    std::cout << vec1;
+    //FullyConnectedLayer l(5, 10);
+    //forward_path(l);
 }
