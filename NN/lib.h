@@ -2,16 +2,58 @@
 
 #include <vector>
 #include <iostream>
-#include <cstddef> // size_t
+#include <cstddef> // std::size_t
 #include <cstdint>
 #include <string>
 #include <map>
 #include <functional> // std::function
 #include <cmath> // std::exp
 
+class Vector;
+class Matrix;
+
 namespace Errors{
-    template<typename T>
-    void same_dimension(){}
+    class DimensionError : public std::exception {
+        public:
+            DimensionError(std::string_view _message) : message(_message){};
+
+            std::string message;
+
+            [[nodiscard("Error Message")]] const char *what() const noexcept override{
+                return message.c_str();
+            }
+    };
+
+    void same_dimension(Vector &v1, Vector &v2){
+        try {
+            if (v1.size() != v2.size()){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << v1.size() << " != " << v2.size() << std::endl;
+        }
+    }
+
+    void same_dimension(Matrix &m1, Matrix &m2){
+        try {
+            if ((m1.num_columns() != m2.num_columns()) && (m1.num_rows() != m2.num_rows())){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << "(" << m1.num_columns() << "," << m1.num_rows() << ")" 
+            << " != " << "(" << m2.num_columns() << "," << m2.num_rows() << ")" << std::endl;
+        }
+    }
+
+    void same_rows_to_colmns(Matrix &m1, Matrix &m2){
+        try {
+            if (m1.num_rows() != m2.num_columns()){
+                throw(DimensionError("Can't execute between different sizes."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << m1.num_columns() << " != " << m2.num_rows() << std::endl;
+        }
+    }
 }
 
 class Vector{
@@ -20,25 +62,28 @@ class Vector{
         using vector_ = std::vector<double>;
 
         Vector() = default;
-        Vector(vector_ p) : m_backing_vec{std::move(p)}{}
+        Vector(vector_ v) : m_backing_vec{std::move(v)}{}
 
-        size_t size = m_backing_vec.size();
-        double get(size_t index) const {return m_backing_vec[index];}
-        void set(size_t index, double element) {m_backing_vec[index] = element;}
-        double operator[](size_t index) const {return m_backing_vec[index];}
+        std::size_t size() const {return m_backing_vec.size();}
+        double get(std::size_t index) const {return m_backing_vec[index];}
+        void set(std::size_t index, double element) {m_backing_vec[index] = element;}
+        double &operator[](const std::size_t index) {return m_backing_vec[index];}
         void push_back(double element){m_backing_vec.push_back(element);}
         void pop_back(){m_backing_vec.pop_back();}
         Vector neg();
         Vector pow(int exp);
-        Vector pow(Vector &exp);
+        Vector pow(const Vector &exp) const;
         Vector operator+(Vector &rhs);
         Vector operator-(Vector &rhs);
         Vector operator/(Vector &rhs);
         Vector operator*(Vector &rhs);
-        friend Vector operator+(double lhs, Vector &rhs){
+        Vector operator<(Vector &rhs);
+        Vector operator>(Vector &rhs);
+        friend Vector operator+(const double lhs, const Vector &rhs){
             auto result = Vector();
-            for (size_t i = 0; i < rhs.size; ++i){
-                auto e = lhs + rhs[i];
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
+                auto e = lhs + rhs.get(i);
                 result.set(i, e);
             }
 
@@ -47,7 +92,8 @@ class Vector{
 
         friend Vector operator-(double lhs, Vector &rhs){
             auto result = Vector();
-            for (size_t i = 0; i < rhs.size; ++i){
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
                 auto e = lhs - rhs[i];
                 result.set(i, e);
             }
@@ -55,21 +101,43 @@ class Vector{
             return result;
         }
 
-        friend Vector operator*(double lhs, Vector &rhs){
+        friend Vector operator*(const double lhs, const Vector &rhs){
             auto result = Vector();
-            for (size_t i = 0; i < rhs.size; ++i){
-                auto e = lhs * rhs[i];
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
+                auto e = lhs * rhs.get(i);
                 result.set(i, e);
             }
 
             return result;
         }
 
-        friend Vector operator/(double lhs, Vector &rhs){
+        friend Vector operator/(const double lhs, const Vector &rhs){
             auto result = Vector();
-            for (size_t i = 0; i < rhs.size; ++i){
-                auto e = lhs - rhs[i];
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
+                auto e = lhs - rhs.get(i);
                 result.set(i, e);
+            }
+
+            return result;
+        }
+
+        friend Vector operator<(double lhs, Vector &rhs){
+            auto result = Vector();
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
+                result.set(i, lhs < rhs[i]);
+            }
+
+            return result;
+        }
+
+        friend Vector operator>(double lhs, Vector &rhs){
+            auto result = Vector();
+
+            for (std::size_t i = 0; i < rhs.size(); ++i){
+                result.set(i, lhs > rhs[i]);
             }
 
             return result;
@@ -79,7 +147,6 @@ class Vector{
         void operator-=(Vector &rhs);
         void operator/=(Vector &rhs);
         void operator*=(Vector &rhs);
-        Vector operator=(Vector &rhs);
         friend std::ostream& operator<<(std::ostream& os, const Vector& p);
         ~Vector() = default;
 
@@ -88,9 +155,13 @@ class Vector{
 };
 
 Vector Vector::operator+(Vector &rhs){
+
+    Errors::same_dimension(*this, rhs);
+
+    std::cout << rhs.size();
     auto result = Vector();
 
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.push_back(this->get(i) + rhs[i]);
     }
 
@@ -100,7 +171,7 @@ Vector Vector::operator+(Vector &rhs){
 Vector Vector::operator-(Vector &rhs){
     auto result = Vector();
 
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.push_back(this->get(i) - rhs[i]);
     }
     return result;
@@ -109,7 +180,7 @@ Vector Vector::operator-(Vector &rhs){
 Vector Vector::operator/(Vector &rhs){ 
     auto result = Vector();
 
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.push_back(this->get(i) - rhs[i]);
     }
     return result;
@@ -118,46 +189,66 @@ Vector Vector::operator/(Vector &rhs){
 Vector Vector::operator*(Vector &rhs){
     auto result = Vector();
 
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.push_back(this->get(i) * rhs[i]);
     }
     return result;
 }
 
+Vector Vector::operator<(Vector &rhs){
+    auto result = Vector();
+
+    for (std::size_t i = 0; i < this->size(); ++i){
+        result.set(i, this->get(i) < rhs[i]);
+    }
+
+    return result;
+}
+
+Vector Vector::operator>(Vector &rhs){
+    auto result = Vector();
+
+    for (std::size_t i = 0; i < this->size(); ++i){
+        result.set(i, this->get(i) > rhs[i]);
+    }
+
+    return result;
+}
+
 void Vector::operator+=(Vector &rhs){
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         auto e = this->get(i) + rhs[i];
         this->set(i, e);
     }
 }
 
 void Vector::operator-=(Vector &rhs){
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         auto e = this->get(i) - rhs[i];
         this->set(i, e);
     }
 }
 
 void Vector::operator/=(Vector &rhs){
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         auto e = this->get(i) / rhs[i];
         this->set(i, e);
     }
 }
 
 void Vector::operator*=(Vector &rhs){
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         auto e = this->get(i) - rhs[i];
         this->set(i, e);
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector& p){
+std::ostream& operator<<(std::ostream& os, Vector& v){
     os << "(";
-    for (size_t i = 0; i < p.size - 1; ++i){
-        os << p[i] << ",";
+    for (std::size_t i = 0; i < v.size() - 1; ++i){
+        os << v[i] << "," << std::endl;
     }
-    os << p.get(p.size - 1) << ")";
+    os << v.get(v.size() - 1) << ")";
 
     return os;
 }
@@ -165,7 +256,7 @@ std::ostream& operator<<(std::ostream& os, const Vector& p){
 Vector Vector::neg(){
     Vector result = Vector();
     
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.set(i, -this->get(i));
     }
 
@@ -175,24 +266,24 @@ Vector Vector::neg(){
 Vector Vector::pow(const int exp){
     Vector result = Vector();
     
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.set(i, std::pow(this->get(i), exp));
     }
 
     return result;
 }
 
-Vector Vector::pow(Vector &exp){
+Vector Vector::pow(const Vector &exp) const{
     Vector result = Vector();
     
-    for (size_t i = 0; i < this->size; ++i){
+    for (std::size_t i = 0; i < this->size(); ++i){
         result.set(i, std::pow(this->get(i), exp.get(i)));
     }
 
     return result;
 }
 
-class Matrix : Vector{
+class Matrix : public Vector{
     
     protected:
     public:
@@ -204,15 +295,15 @@ class Matrix : Vector{
         Matrix operator+(Matrix &rhs);
         Matrix operator*(Matrix &rhs);
         Matrix operator/(Matrix &rhs);
-        size_t num_columns = m_backing_matrix.size();
-        size_t num_rows = m_backing_matrix[0].size;
-        Vector& operator[](size_t index){return m_backing_matrix[index];}
+        std::size_t num_columns(){return m_backing_matrix.size();}
+        std::size_t num_rows(){return m_backing_matrix[0].size();}
+        Vector& operator[](std::size_t index){return m_backing_matrix[index];}
         void operator+=(Matrix &rhs);      
         void operator-=(Matrix &rhs);
         void operator*=(Matrix &rhs);
         void operator/=(Matrix &rhs);
-        Vector& get(size_t index){return m_backing_matrix[index];}
-        void set(size_t index, Vector element){m_backing_matrix[index] = element;}
+        Vector& get(std::size_t index){return m_backing_matrix[index];}
+        void set(std::size_t index, Vector element){m_backing_matrix[index] = element;}
         void push_back(Vector element){m_backing_matrix.push_back(element);}
         void pop_back(){m_backing_matrix.pop_back();}
         
@@ -223,8 +314,9 @@ class Matrix : Vector{
 };
 
 Matrix Matrix::operator+(Matrix &rhs){
+    //Errors::same_dimension(*this, rhs); 
     auto result = Matrix();
-    for(size_t i = 0; i < this->num_columns; ++i){
+    for(std::size_t i = 0; i < this->num_columns(); ++i){
         const auto e = this->get(i) + rhs.get(i);
         result.push_back(e);
     }
@@ -234,7 +326,7 @@ Matrix Matrix::operator+(Matrix &rhs){
 
 Matrix Matrix::operator-(Matrix &rhs){
     auto result = Matrix();
-    for(size_t i = 0; i < this->num_columns; ++i){
+    for(std::size_t i = 0; i < this->num_columns(); ++i){
         const auto e = this->get(i) - rhs.get(i);
         result.push_back(e);
     }
@@ -245,13 +337,13 @@ Matrix Matrix::operator-(Matrix &rhs){
 Matrix Matrix::operator*(Matrix &rhs){
     auto result = Matrix();
     //Fehler ding
-    if(this->num_columns != rhs.num_rows){
+    if(this->num_columns() != rhs.num_rows()){
         throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
     }
 
-    for(size_t i = 0; i < this->num_rows; ++i){
-        for (size_t k = 0; k < rhs.num_columns; ++k){
-            for(size_t j = 0; j < rhs.num_rows; ++j){
+    for(std::size_t i = 0; i < this->num_rows(); ++i){
+        for (std::size_t k = 0; k < rhs.num_columns(); ++k){
+            for(std::size_t j = 0; j < rhs.num_rows(); ++j){
                 result[i].set(j, result[i][j] * rhs[i][j]);
             }
         }
@@ -263,7 +355,7 @@ Matrix Matrix::operator*(Matrix &rhs){
 
 void Matrix::operator+=(Matrix &rhs){
     //Fehler ding 
-    for(size_t i = 0; i < this->num_columns; ++i){
+    for(std::size_t i = 0; i < this->num_columns(); ++i){
         this->set(i, this->get(i) + rhs[i]);
     }
 }
@@ -271,20 +363,20 @@ void Matrix::operator+=(Matrix &rhs){
 void Matrix::operator-=(Matrix &rhs){
    
     //Fehler ding
-    for(size_t i = 0; i < this->num_columns; ++i){
+    for(std::size_t i = 0; i < this->num_columns(); ++i){
         this->set(i, this->get(i) - rhs[i]);
     }
 }
 
 void Matrix::operator*=(Matrix &rhs){
     //Fehler ding
-    if(this->num_columns != rhs.num_rows){
+    if(this->num_columns() != rhs.num_rows()){
         throw std::invalid_argument ("Matrixen sind ned für Multiplickation geigenet");
     }
 
-    for(size_t i = 0; i < this->num_rows; ++i){
-        for (size_t k = 0; k < rhs.num_columns; ++k){
-            for(size_t j = 0; j < rhs.num_rows; ++j){
+    for(std::size_t i = 0; i < this->num_rows(); ++i){
+        for (std::size_t k = 0; k < rhs.num_columns(); ++k){
+            for(std::size_t j = 0; j < rhs.num_rows(); ++j){
                 this->get(i).set(j, this->get(i).get(j) * rhs[k][j]);
             }
         }
@@ -297,24 +389,37 @@ class ActiviationFunctions{
     public:
         ActiviationFunctions() = default;
         ActiviationFunctions(Vector &v, std::string name="sigmoid");
-        Vector sigmoid(Vector &v);
-        void testFunc1() {
-            puts("func2");
-        }
+        static Vector sigmoid(Vector &v);
+        static Vector relu(Vector &v);
         ~ActiviationFunctions() = default;
 };
 
 ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
     using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
     ActMap activation_functions = {{"sigmoid", sigmoid}};
-
     auto activiation_result = activation_functions[name](v);
 }
 
+
 Vector ActiviationFunctions::sigmoid(Vector &v){
-    auto e = std::exp(1);
-    auto e_vector = Vector(std::vector<double>(v.size, e));
-    auto _x = v.neg();
+    static const auto e = std::exp(1);
+    static auto e_vector = Vector(std::vector<double>(v.size(), e));
+    const auto _x = v.neg();
     const auto e_x = e_vector.pow(_x);
+
     return (1.0 / (1.0 + e_x));
+}
+
+Vector ActiviationFunctions::relu(Vector &v){
+    auto result = Vector();
+
+    for (std::size_t i = 0; i < v.size(); ++i){
+        if (v[i] <= 0){
+            result[i] = 0;
+        } else{
+            result[i] = v[i];
+        }
+    }
+
+    return result;
 }
