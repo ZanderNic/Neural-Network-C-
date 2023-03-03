@@ -33,12 +33,15 @@ Matrix Matrix::operator*(Matrix &rhs){
 
     Errors::same_rows_to_colmns(*this, rhs);
 
-    auto result = Matrix();
+    auto n = this->num_rows();
+    auto m = rhs.num_columns();
+    auto result = Matrix(n, m);
+    std::cout << *this;
 
-    for(std::size_t i = 0; i < this->num_rows(); ++i){
-        for (std::size_t k = 0; k < rhs.num_columns(); ++k){
-            for(std::size_t j = 0; j < rhs.num_rows(); ++j){
-                result[i].set(j, result[i][j] * rhs[i][j]);
+    for (std::size_t i = 0; i < this->num_rows(); ++i){
+        for (std::size_t k = 0; k < rhs.num_rows(); ++k){
+            for (std::size_t j = 0; j < this->num_columns(); ++j){
+                result[i][j] += this->get(i)[k] * rhs[k][j];
             }
         }
     }

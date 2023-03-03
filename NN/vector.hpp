@@ -10,12 +10,14 @@
 #include <cmath> // std::exp
 
 class Vector{
+    private:
+        using vector_ = std::vector<double>;
+        vector_ m_backing_vec;
     protected:
     public:
-        using vector_ = std::vector<double>;
-
         Vector() = default;
-        Vector(vector_ v) : m_backing_vec{std::move(v)}{}
+        Vector(vector_ v) : m_backing_vec(std::move(v)){}
+        Vector(size_t len) : m_backing_vec(len, 1){}
 
         std::size_t size() const {return m_backing_vec.size();}
         double get(std::size_t index) const {return m_backing_vec[index];}
@@ -113,18 +115,5 @@ class Vector{
 
 
         ~Vector() = default;
-
-    private:
-        vector_ m_backing_vec;
 };
 
-class ActiviationFunctions{
-    private:
-    protected:
-    public:
-        ActiviationFunctions() = default;
-        ActiviationFunctions(Vector &v, std::string name="sigmoid");
-        static Vector sigmoid(Vector &v);
-        static Vector relu(Vector &v);
-        ~ActiviationFunctions() = default;
-};

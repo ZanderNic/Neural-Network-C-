@@ -1,5 +1,16 @@
 #include "vector.hpp"
 
+class ActiviationFunctions{
+    private:
+    protected:
+    public:
+        ActiviationFunctions() = default;
+        ActiviationFunctions(Vector &v, std::string name="sigmoid");
+        static Vector sigmoid(Vector &v);
+        static Vector relu(Vector &v);
+        ~ActiviationFunctions() = default;
+};
+
 ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
     using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
     ActMap activation_functions = {{"sigmoid", sigmoid}};

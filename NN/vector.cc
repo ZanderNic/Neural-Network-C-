@@ -1,6 +1,5 @@
 #include "vector.hpp"
 #include "errors.hpp"
-#include "matrix.hpp"
 
 Vector Vector::operator+(Vector &rhs){
 
