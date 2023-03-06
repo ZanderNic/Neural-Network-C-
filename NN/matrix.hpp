@@ -9,18 +9,15 @@ class Matrix : public Vector{
     protected:
     public:
         Matrix() = default;
-        Matrix(size_t num_rows, size_t num_cols) : m_backing_matrix(num_cols, Vector(num_rows)){}
+        Matrix(size_t num_rows, size_t num_cols) : m_backing_matrix(num_rows, Vector(num_cols)){}
         Matrix(matrix_ m) : m_backing_matrix(std::move(m)){}
 
         Matrix operator-(Matrix &rhs);
         Matrix operator+(Matrix &rhs);
         Matrix operator*(Matrix &rhs);
-        std::size_t num_columns() const {return m_backing_matrix.size();}
-        std::size_t num_rows() const {return m_backing_matrix[0].size();}
-        Vector& operator[](const std::size_t index) {
-            
-            for (size_t i = 0; i < this->num_columns(); ++i){
-                m_backing_matrix[index];}
+        std::size_t num_columns() const {return m_backing_matrix[0].size();}
+        std::size_t num_rows() const {return m_backing_matrix.size();}
+        Vector& operator[](const std::size_t index) {return m_backing_matrix[index];}
         void operator+=(Matrix &rhs);
         void operator-=(Matrix &rhs);
         void operator*=(Matrix &rhs);
@@ -35,7 +32,8 @@ class Matrix : public Vector{
                 }
                os << std::endl;
             }
-
+            os << std::endl;
+            os << std::endl;
             return os;
         }
         

@@ -7,9 +7,12 @@
 
 void forward_path(FullyConnectedLayer layer){
     // weights @ inputs + bias = Ouputs
-    Matrix output_ = (layer.get_weights() * layer.get_inputs());// + layer.get_biases();
-
-    //Vector output = Utils::matrix_to_vector(output_);
-    //layer.set_outputs(output);
-    //std::cout << layer.get_outputs();
+    std::cout << "Inputs: \n";
+    std::cout << layer.get_inputs();
+    std::cout << "Weights: \n";
+    std::cout<< layer.get_weights() ;
+    
+    
+    Matrix output_((layer.get_inputs() * layer.get_weights()));
+    std::cout << output_ ;
 }
