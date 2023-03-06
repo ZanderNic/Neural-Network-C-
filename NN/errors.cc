@@ -8,6 +8,7 @@ namespace Errors{
             }
         } catch (DimensionError e){
             std::cerr << e.what() << v1.size() << " != " << v2.size() << std::endl;
+            exit(20);
         }
     }
 
@@ -19,16 +20,29 @@ namespace Errors{
         } catch (DimensionError e){
             std::cerr << e.what() << "(" << m1.num_columns() << "," << m1.num_rows() << ")" 
             << " != " << "(" << m2.num_columns() << "," << m2.num_rows() << ")" << std::endl;
+            exit(20);
         }
     }
 
     void same_rows_to_colmns(Matrix &m1, Matrix &m2){
         try {
-            if (m1.num_rows() != m2.num_columns()){
+            if (m1.num_columns() != m2.num_rows()){
                 throw(DimensionError("Can't execute between different sizes."));
             }
         } catch (DimensionError e){
-            std::cerr << e.what() << m1.num_columns() << " != " << m2.num_rows() << std::endl;
+            std::cerr << e.what() << " " << m1.num_columns() << " != " << m2.num_rows() << std::endl;
+            exit(20);
+        }
+    }
+
+    void only_1D_matrices(Matrix &m){
+        try {
+            if (m.num_columns() != 1){
+                throw(DimensionError("Only 1D Matrices allow."));
+            }
+        } catch (DimensionError e){
+            std::cerr << e.what() << " " << m.num_columns() << std::endl;
+            exit(20);
         }
     }
 }

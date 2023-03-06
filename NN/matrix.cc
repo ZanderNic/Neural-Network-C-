@@ -36,11 +36,11 @@ Matrix Matrix::operator*(Matrix &rhs){
     auto n = this->num_rows();
     auto m = rhs.num_columns();
     auto result = Matrix(n, m);
-
-    for (std::size_t i = 0; i < this->num_columns(); ++i){
-        for (std::size_t k = 0; k < rhs.num_rows(); ++k){
-            for (std::size_t j = 0; j < this->num_columns(); ++j){
-                result[i][j] += this->get(i).get(k) * rhs[k][j];
+ 
+    for (std::size_t i = 0; i < this->num_rows(); ++i){
+        for (std::size_t j = 0; j < rhs.num_columns(); ++j){
+            for (std::size_t k = 0; k < this->num_columns(); ++k){
+                result[i][j] += this->get(i)[k] * rhs[k][j];
             }
         }
     }

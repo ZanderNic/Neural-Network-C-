@@ -8,5 +8,4 @@
 int main(){
     FullyConnectedLayer l(5, 10);
     forward_path(l);
-    
 }

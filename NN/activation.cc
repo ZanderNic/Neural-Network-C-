@@ -1,41 +1,37 @@
-#include "vector.hpp"
+#include "activation.hpp"
+#include "errors.hpp"
 
-class ActiviationFunctions{
-    private:
-    protected:
-    public:
-        ActiviationFunctions() = default;
-        ActiviationFunctions(Vector &v, std::string name="sigmoid");
-        static Vector sigmoid(Vector &v);
-        static Vector relu(Vector &v);
-        ~ActiviationFunctions() = default;
-};
+namespace ActivationFunctions{
+    Matrix sigmoid(Matrix &m){
 
-ActiviationFunctions::ActiviationFunctions(Vector &v, std::string name){
-    using ActMap = std::map<std::string, std::function<Vector(Vector &)>>;
-    ActMap activation_functions = {{"sigmoid", sigmoid}};
-    auto activiation_result = activation_functions[name](v);
-}
+        Errors::only_1D_matrices(m);
 
-Vector ActiviationFunctions::sigmoid(Vector &v){
-    static const auto e = std::exp(1);
-    static auto e_vector = Vector(std::vector<double>(v.size(), e));
-    const auto _x = v.neg();
-    const auto e_x = e_vector.pow(_x);
+        auto result = Matrix(m.num_rows(), 1);
 
-    return (1.0 / (1.0 + e_x));
-}
-
-Vector ActiviationFunctions::relu(Vector &v){
-    auto result = Vector();
-
-    for (std::size_t i = 0; i < v.size(); ++i){
-        if (v[i] <= 0){
-            result[i] = 0;
-        } else{
-            result[i] = v[i];
+        static const auto e = std::exp(1);
+        
+        for (std::size_t i = 0; i < m.num_rows(); ++i){
+            auto _x = -m[i][0];
+            result[i][0] = (1.0 / (1.0 + std::pow(e, _x)));
         }
+
+        return result;
     }
 
-    return result;
+    Matrix relu(Matrix &m){
+
+        Errors::only_1D_matrices(m);
+
+        auto result = Matrix(m.num_rows(), 1);
+
+        for (std::size_t i = 0; i < m.num_rows(); ++i){
+            if (m[i][0] <= 0){
+                result[i][0] = 0;
+            } else{
+                result[i][0] = m[i][0];
+            }
+        }
+
+        return result;
+    }
 }

@@ -22,7 +22,9 @@ class FullyConnectedLayer{
         void init_weights(unsigned int num_of_prev_neurons, unsigned int num_of_neurons);
         Matrix& get_inputs(){return m_inputs;}
         Matrix& get_outputs(){return m_outputs;}
-        void set_outputs(Vector &outputs){std::cout << m_outputs.num_rows(); m_outputs[0] = outputs;}
+       
+        void set_outputs(Matrix const &outputs){m_outputs = outputs;}
+        
         Matrix& get_weights(){return m_weights;}
         Matrix& get_biases(){return m_bias;}
         unsigned int get_num_neurons(){return m_num_of_neurons;}
@@ -44,10 +46,10 @@ FullyConnectedLayer::FullyConnectedLayer(unsigned int num_of_neurons) :
 FullyConnectedLayer::FullyConnectedLayer(unsigned int num_of_neurons, unsigned int num_of_prev_neurons) : 
         m_num_of_neurons(num_of_neurons), 
         m_num_of_prev_neurons(num_of_prev_neurons),
-        m_inputs(Matrix(m_num_of_prev_neurons, m_num_of_neurons)),
-        m_outputs(Matrix(1, m_num_of_neurons)),
+        m_inputs(Matrix(m_num_of_prev_neurons, 1)),
+        m_outputs(Matrix(m_num_of_neurons, 1)),
         m_weights(Matrix(m_num_of_neurons, m_num_of_prev_neurons)),
-        m_bias(Matrix(1, m_num_of_neurons)) {
+        m_bias(Matrix(m_num_of_neurons, 1)) {
     
     //m_bias[0] = Vector(std::vector<double>(m_num_of_neurons));
     init_weights(num_of_neurons, num_of_prev_neurons);
@@ -62,7 +64,7 @@ void FullyConnectedLayer::init_weights(unsigned int num_of_neurons, unsigned int
     for (std::size_t j = 0; j < num_of_neurons; ++j){
         // num_prev_neurons is also num_of_connection = weights_per_neuron
         for (std::size_t k = 0; k < m_num_of_prev_neurons; ++k){
-            m_weights.get(j)[k] = j * k; //dist(generator)
+            m_weights.get(j)[k] = dist(generator);
         }
     }
 }

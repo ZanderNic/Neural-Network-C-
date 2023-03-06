@@ -19,5 +19,5 @@ namespace Errors{
     void same_dimension(Vector &v1, Vector &v2);
     void same_dimension(Matrix &m1, Matrix &m2);
     void same_rows_to_colmns(Matrix &m1, Matrix &m2);
-
+    void only_1D_matrices(Matrix &m);
 };

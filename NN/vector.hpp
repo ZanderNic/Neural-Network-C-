@@ -17,7 +17,7 @@ class Vector{
     public:
         Vector() = default;
         Vector(vector_ v) : m_backing_vec(std::move(v)){}
-        Vector(size_t len) : m_backing_vec(len, 1){}
+        Vector(size_t len, double value = 0.0) : m_backing_vec(len, value){}
 
         std::size_t size() const {return m_backing_vec.size();}
         double get(std::size_t index) const {return m_backing_vec[index];}
