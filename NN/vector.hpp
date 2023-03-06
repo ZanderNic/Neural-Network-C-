@@ -34,6 +34,7 @@ class Vector{
         Vector operator*(Vector &rhs);
         Vector operator<(Vector &rhs);
         Vector operator>(Vector &rhs);
+        explicit operator bool() const { return (m_backing_vec.size() >= 0); }
         friend Vector operator+(const double lhs, const Vector &rhs){
             auto result = Vector();
 

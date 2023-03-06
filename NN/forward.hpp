@@ -3,11 +3,11 @@
 #include "layer.hpp"
 #include "vector.hpp"
 #include "matrix.hpp"
-#include "utils.hpp"
-#include "activation.hpp"
+#include "activation_func.hpp"
 
 void forward_path(FullyConnectedLayer layer){
     // weights @ inputs + bias = Ouputs
+    // layer.set_inputs();
     std::cout << "Weights: \n";
     std::cout<< layer.get_weights() ;
     std::cout << "Inputs: \n";

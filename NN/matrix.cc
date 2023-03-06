@@ -48,6 +48,17 @@ Matrix Matrix::operator*(Matrix &rhs){
     return result;
 };
 
+Matrix Matrix::operator*(double &rhs){
+
+    auto result = Matrix();
+
+    for(std::size_t i = 0; i < this->num_rows(); ++i){
+        result[i] = rhs * this->get(i);
+    }
+
+    return result;
+}
+
 void Matrix::operator+=(Matrix &rhs){
 
     Errors::same_dimension(*this, rhs);

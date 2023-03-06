@@ -1,7 +1,12 @@
-#include "activation.hpp"
+#include "activation_func.hpp"
 #include "errors.hpp"
 
 namespace ActivationFunctions{
+    std::map<std::string, ActivationFunctions::actFunc>activation_functions = {
+        {"sigmoid", sigmoid},
+        {"relu", relu},
+    };
+
     Matrix sigmoid(Matrix &m){
 
         Errors::only_1D_matrices(m);

@@ -38,7 +38,7 @@ namespace Errors{
     void only_1D_matrices(Matrix &m){
         try {
             if (m.num_columns() != 1){
-                throw(DimensionError("Only 1D Matrices allow."));
+                throw(DimensionError("Only 1D Matrices allow is"));
             }
         } catch (DimensionError e){
             std::cerr << e.what() << " " << m.num_columns() << std::endl;
