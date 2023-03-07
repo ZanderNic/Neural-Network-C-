@@ -4,7 +4,7 @@
 #include "layer.hpp"
 #include "forward.hpp"
 #include "matrix.hpp"
-#include "createNN.hpp"
+#include "NN.hpp"
 
 int main(){
     FullyConnectedLayer l(5, 10);

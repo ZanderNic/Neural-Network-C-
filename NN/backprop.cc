@@ -1,14 +1,14 @@
 #include "optimizer.hpp"
 #include "matrix.hpp"
-#include "createNN.hpp"
+#include "NN.hpp"
 
 class BackPropergation{
     private:
     protected:
     public:
-        BackPropergation(NN network){
-            while(m.get_errors()){
-
+        BackPropergation(NN &network){
+            for (auto &layer : network.get_layers()){
+                
             }
         };
 

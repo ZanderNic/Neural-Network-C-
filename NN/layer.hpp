@@ -13,7 +13,7 @@ class FullyConnectedLayer{
         Matrix m_inputs;
         Matrix m_outputs;
         Matrix m_weights;
-        Matrix m_errors;
+        Matrix m_loss;
         Matrix m_bias;
     protected:
     public:
@@ -28,7 +28,7 @@ class FullyConnectedLayer{
         void set_inputs(Matrix const &inputs){m_inputs = inputs;}
         Matrix& get_weights(){return m_weights;}
         Matrix& get_biases(){return m_bias;}
-        Matrix& get_errors(){return m_errors;}
+        Matrix& get_loss(){return m_loss;}
         unsigned int get_num_neurons(){return m_num_of_neurons;}
         unsigned int get_num_of_prev_neurons(){return m_num_of_prev_neurons;}
         ~FullyConnectedLayer() = default;
@@ -53,7 +53,7 @@ FullyConnectedLayer::FullyConnectedLayer(unsigned int num_of_neurons, unsigned i
         m_outputs(Matrix(m_num_of_neurons, 1)),
         m_weights(Matrix(m_num_of_neurons, m_num_of_prev_neurons)),
         m_bias(Matrix(m_num_of_neurons, 1)),
-        m_errors(Matrix(m_num_of_neurons, m_num_of_prev_neurons)) {
+        m_loss(Matrix(m_num_of_neurons, m_num_of_prev_neurons)) {
     
     init_bias(num_of_neurons);
     init_weights(num_of_neurons, num_of_prev_neurons);
