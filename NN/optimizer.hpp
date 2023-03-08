@@ -4,8 +4,6 @@
 #include "any"
 
 namespace Optimizer{
-    
-
     class SGD{
         public:
             SGD() = default;

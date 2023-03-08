@@ -4,7 +4,12 @@
 
 namespace LossFunction{
     using lossFunc = std::function<double(Matrix &, Matrix &)>;
-    double MSE(Matrix &pred, Matrix &real);
 
-    extern std::map<std::string, lossFunc>loss_functions;
+    class MSE{
+        MSE() = default;
+        Matrix fit(Matrix &pred, Matrix &real);
+        Matrix deviation(Matrix &pred, Matrix &real);
+        ~MSE() = default;
+    }
+
 }

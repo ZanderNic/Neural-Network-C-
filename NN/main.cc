@@ -7,6 +7,6 @@
 #include "NN.hpp"
 
 int main(){
-    FullyConnectedLayer l(5, 10);
-    forward_path(l);
+    auto a = Matrix(5, 10);
+    std::cout << a[0];
 }

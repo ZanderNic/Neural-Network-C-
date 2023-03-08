@@ -4,18 +4,23 @@
 
 namespace LossFunction{
     std::map<std::string, lossFunc>loss_functions = {
-        {"MSE", MSE},
+        {"MSE", MSE()},
     };
 
-    double MSE(Matrix &pred, Matrix &real){
+    Matrix MSE::fit(Matrix &pred, Matrix &real){
+        Errors::only_1D_matrices(pred);
         Errors::same_dimension(pred, real);
+        
 
-        double sum = 0.0;
+        Matrix result(pred.num_rows(), pred.num_columns());
 
         for (std::size_t i = 0; i < pred.num_rows(); ++i){
-            sum += std::pow((pred[i][0] - real[i][0]), 2);
+            result[i][0] = (1 / 2) * std::pow((pred[i][0] - real[i][0]), 2);
         }
 
-        return sum / pred.num_rows();
+        return result;
+    }
+    Matrix MSE::deviation(Matrix &pred, Matrix &real){
+        return pred - real;
     }
 }

@@ -8,8 +8,19 @@
 namespace ActivationFunctions{
     using actFunc = std::function<Matrix(Matrix &)>;
 
-    Matrix sigmoid(Matrix &m);
-    Matrix relu(Matrix &m);
+    class Sigmoid{
+        public:
+            Sigmoid() = default;
+            Matrix fit(Matrix &datapoint);
+            Matrix deviation(Matrix &loss);
+    };
+
+    class Relu{
+        public:
+            Relu() = default;
+            Matrix fit(Matrix &datapoint);
+            Matrix deviation(Matrix &loss);
+    };
 
     extern std::map<std::string, ActivationFunctions::actFunc>activation_functions;
 }

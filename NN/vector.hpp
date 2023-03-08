@@ -26,6 +26,7 @@ class Vector{
         void push_back(double element){m_backing_vec.push_back(element);}
         void pop_back(){m_backing_vec.pop_back();}
         Vector neg();
+        int sum();
         Vector pow(int exp);
         Vector pow(const Vector &exp) const;
         Vector operator+(Vector &rhs);

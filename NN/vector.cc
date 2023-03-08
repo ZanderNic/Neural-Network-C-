@@ -126,6 +126,16 @@ Vector Vector::neg(){
     return result;
 }
 
+int Vector::sum(){
+    int sum_ = 0;
+    
+    for (std::size_t i = 0; i < this->size(); ++i){
+        sum_ += this->get(i);
+    }
+
+    return sum_; 
+}
+
 Vector Vector::pow(const int exp){
     Vector result = Vector();
     
