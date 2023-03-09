@@ -72,8 +72,6 @@ void FullyConnectedLayer::init_bias(unsigned int num_of_neurons){
     }
 }
 
-
-
 class InputLayer : public FullyConnectedLayer{
     private:
         Matrix m_dataset;
@@ -89,11 +87,7 @@ class InputLayer : public FullyConnectedLayer{
 
 // This constructor is for the Input Layer(first layer)
 InputLayer::InputLayer(Matrix dataset) :
-        m_dataset(dataset),
-        m_inputs(Matrix(dataset.num_rows(), dataset.num_columns())),
-        m_outputs(Matrix(dataset.num_rows(), 1)),
-        m_bias(Matrix(dataset.num_rows(), 1)),
-        m_num_of_neurons(dataset.num_rows()){
+        FullyConnectedLayer(dataset.num_rows(), dataset.num_columns()),
+        m_dataset(dataset){
     init_bias(dataset.num_rows());
-
 }

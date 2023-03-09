@@ -1,13 +1,8 @@
 #pragma once 
 
 #include "matrix.hpp"
-#include "any"
 
-class Optimizer{
-    Optimizer() = default;
-    ~Optimizer() = default;
-    Optimizer(std::string act);
-
+namespace Optimizer{
     class SGD{
         public:
             SGD() = default;
@@ -40,4 +35,15 @@ class Optimizer{
             void fit(Matrix &weight, double lr, Matrix &loss);
             ~BatchGD() = default;
     };
-};
+
+    using opt = SGD;
+    void choose_optimizer(std::string optimizer){
+        if (optimizer == "SGD"){
+            using opt = SGD;
+        } else if (optimizer == "MiniBatchGD"){
+            using opt = MiniBatchGD;
+        } else if (optimizer == "BatchGD"){
+            using opt = BatchGD;
+        }
+    }
+}

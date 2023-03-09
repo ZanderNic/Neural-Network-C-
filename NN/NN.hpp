@@ -40,9 +40,9 @@ class NN{
 };
 
 NN::NN(Matrix input, std::vector<int> classes, std::string activation_func, std::string loss_func, std::string optimizer, std::vector<FullyConnectedLayer> layers) : 
-    m_activation_function(ActivationFunctions::activation_functions[activation_func]),
-    m_loss_functions(LossFunction::loss_functions[loss_func]),
-    m_optimizier(Optimizer::optimizer[optimizer]),
+    m_activation_function(ActivationFunctions::choose_activation_func(activation_func)),
+    m_loss_functions(LossFunction::choose_loss_func(loss_func)),
+    m_optimizier(Optimizer::choose_optimizer(optimizer)),
     m_layers(layers),
     m_input(input),
     m_classes(classes){}

@@ -3,10 +3,6 @@
 #include "utils.hpp"
 
 namespace LossFunction{
-    std::map<std::string, lossFunc>loss_functions = {
-        {"MSE", MSE()},
-    };
-
     Matrix MSE::fit(Matrix &pred, Matrix &real){
         Errors::only_1D_matrices(pred);
         Errors::same_dimension(pred, real);

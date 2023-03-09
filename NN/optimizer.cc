@@ -4,18 +4,7 @@
 
 #include "optimizer.hpp"
 
-
-class Optimizer{
-    Optimizer(std::string act){
-        if (act == "SGD"){
-            SGD();
-        } else if (act == "MiniBatchGD"){
-            MiniBatchGD();
-        } else if (act == "BatchGD"){
-            BatchGD();
-        }
-    }
-
+namespace Optimizer{
     class SGD{
         private:
             std::size_t num_p_per_backprop;
@@ -100,4 +89,4 @@ class Optimizer{
 
             ~BatchGD() = default;
     };
-};
+}

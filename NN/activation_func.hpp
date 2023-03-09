@@ -6,8 +6,6 @@
 #include "matrix.hpp"
 
 namespace ActivationFunctions{
-    using actFunc = std::function<Matrix(Matrix &)>;
-
     class Sigmoid{
         public:
             Sigmoid() = default;
@@ -22,5 +20,12 @@ namespace ActivationFunctions{
             Matrix deviation(Matrix &loss);
     };
 
-    extern std::map<std::string, ActivationFunctions::actFunc>activation_functions;
+    using actFunc = Sigmoid;
+    void choose_activation_func(std::string activationfunc){
+        if (activationfunc == "sigmoid"){
+            using actFunc = Sigmoid;
+        } else if (activationfunc == "relu"){
+            using actFunc = Relu;
+        }
+    }
 }
