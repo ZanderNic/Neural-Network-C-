@@ -3,12 +3,18 @@
 #include <tuple>
 
 #include "optimizer.hpp"
-namespace Optimizer{
-    std::map<std::string, opt>optimizer = {
-        {"SGD", SGD()},
-        {"MiniBatchGD", MiniBatchGD()},
-        {"BatchGD", BatchGD()},
-    };
+
+
+class Optimizer{
+    Optimizer(std::string act){
+        if (act == "SGD"){
+            SGD();
+        } else if (act == "MiniBatchGD"){
+            MiniBatchGD();
+        } else if (act == "BatchGD"){
+            BatchGD();
+        }
+    }
 
     class SGD{
         private:
@@ -94,4 +100,4 @@ namespace Optimizer{
 
             ~BatchGD() = default;
     };
-}
+};
