@@ -3,6 +3,7 @@
 #include <functional>
 #include <map>
 #include <tuple>
+#include <vector>
 
 #include "matrix.hpp"
 #include "layer.hpp"
@@ -19,14 +20,14 @@ class NN{
         LossFunction::lossFunc m_loss_functions;
         Optimizer::opt m_optimizier;
         Matrix m_input;
-        Matrix m_classes;
+        std::vector<int> m_classes;
         Matrix m_batch_classes;
         InputLayer m_input_layer;
         std::vector<FullyConnectedLayer> m_layers;
     protected:
     public:
         NN() = delete;
-        NN(Matrix input, std::vector classes, std::string activation_func, std::string loss_func, std::string optimizer, std::vector<FullyConnectedLayer> layers);
+        NN(Matrix input, std::vector<int> classes, std::string activation_func, std::string loss_func, std::string optimizer, std::vector<FullyConnectedLayer> layers);
         ActivationFunctions::actFunc get_activation_function(){return m_activation_function;}
         LossFunction::lossFunc get_loss_functions(){return m_loss_functions;}
         Optimizer::opt get_optimizier(){return m_optimizier;}
@@ -35,7 +36,7 @@ class NN{
         Matrix get_batch_classes(){return m_batch_classes;}
         bool is_converged(Matrix &current_loss, Matrix &prev_loss);
         std::vector<FullyConnectedLayer>& get_layers(){return m_layers;}
-        void fit();
+        void fit(unsigned int epochs, unsigned int batch_size, unsigned int learning_rate);
         ~NN() = default;
 };
 
