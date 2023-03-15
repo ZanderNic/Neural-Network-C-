@@ -5,6 +5,7 @@
 #include "matrix.hpp"
 #include "vector.hpp"
 #include "forward.hpp"
+class Test{};
 
 class FullyConnectedLayer{
     private:
@@ -81,6 +82,7 @@ class InputLayer : public FullyConnectedLayer{
         InputLayer(Matrix dataset);
         std::size_t num_datapoints(){return m_dataset.num_rows();}
         std::size_t num_dimensions(){return m_dataset.num_columns();}
+        void set_inputs(Matrix const &inputs){m_inputs = inputs;}
         Matrix& get_dataset(){return m_dataset;}
         ~InputLayer() = default;
 };
